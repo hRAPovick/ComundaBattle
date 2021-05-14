@@ -1,4 +1,6 @@
 spring.datasource.url: jdbc:h2:file:./camunda-h2-database
+url: http://localhost:8080/warrior
+fileUrl: /Peoples.txt
 maxWarriors: 100
 camunda.bpm.admin-user:
   id: demo
