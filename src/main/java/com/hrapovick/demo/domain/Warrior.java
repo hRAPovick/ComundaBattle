@@ -12,11 +12,9 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Warrior implements Serializable {
     private static final long serialVersionUID = 1L;
-    @JsonAlias("name.findName")
     private String name;
-    @JsonAlias("name.title")
     private String title;
     private Boolean isAlive;
-    @JsonAlias("random.number")
+    //@JsonAlias("random.number")
     private Integer hp;
 }

@@ -4,6 +4,8 @@ import com.hrapovick.demo.domain.Warrior;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.connect.Connectors;
 import org.camunda.connect.httpclient.HttpConnector;
 import org.camunda.connect.httpclient.HttpRequest;
@@ -14,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+
+import static org.camunda.spin.Spin.JSON;
 
 @Component
 public class PrepareToBattle implements JavaDelegate {
@@ -44,7 +48,10 @@ public class PrepareToBattle implements JavaDelegate {
         }
 
         System.out.println(String.format("Prepare to battle! Enemy army = %s vs. our army %s", enemyWarriors, warriors));
+
+        ObjectValue armyJson = Variables.objectValue(army).serializationDataFormat("application/json").create();
         delegateExecution.setVariable("army", army);
+        delegateExecution.setVariable("armyJson", armyJson);
         delegateExecution.setVariable("enemyWarriors", enemyWarriors);
 
     }
@@ -64,11 +71,12 @@ public class PrepareToBattle implements JavaDelegate {
 
         HttpResponse response = httpRequest.execute();
         if (response.getStatusCode() == 200) {
-            SpinJsonNode node = Spin.JSON(response.getResponse());
-            warrior.setTitle(node.prop("name").stringValue());
-            warrior.setName(node.prop("title").stringValue());
-            warrior.setHp((Integer) node.prop("hp").numberValue());
-            warrior.setIsAlive(true);
+            warrior = JSON(response.getResponse()).mapTo(Warrior.class);
+//            SpinJsonNode node = Spin.JSON(response.getResponse());
+//            warrior.setTitle(node.prop("name").stringValue());
+//            warrior.setName(node.prop("title").stringValue());
+//            warrior.setHp((Integer) node.prop("hp").numberValue());
+//            warrior.setIsAlive(true);
         }
         response.close();
         return warrior;
